@@ -19,14 +19,14 @@ def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_
     for i, url in enumerate(tqdm(url_list)):
 
         split_text = url.split("/") # Pretty sure we can delete some of this now
-        split_text_2 = split_text[-1].split("?") # This as well. But it works, so lets keep it!
+        split_text_2 = split_text[-1].split("?") # This as well. But I mean it works... Lets keep it, why not
         if len(split_text_2) > 1:
             filename = split_text_2[0]
         else:
             filename = split_text[-1]
 
         while Path(filename).suffix:
-            filename = Path(filename).stem
+            filename = Path(filename).stem      # We can fix the downloads here by manually adding extensions to them all
         filename = f"{link_index[i]}_" + filename + ".pdf"
 
         save_path = PDF_DOWNLOAD_FOLDER / filename
@@ -53,7 +53,6 @@ def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_
         with open(save_path, "wb") as f:
             f.write(r.content)
         # Alternative pathlib write: save_path.write_bytes(r.content)
-
 
 def is_pdf(response):
     '''
