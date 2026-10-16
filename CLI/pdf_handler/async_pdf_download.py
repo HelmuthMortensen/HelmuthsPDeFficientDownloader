@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 
 # Importing the relevant paths from config
-from cli.config import PDF_DOWNLOAD_FOLDER
+from config import PDF_DOWNLOAD_FOLDER
 
 def is_pdf(content:bytes) -> bool:
     return content.startswith(b'%PDF-')
@@ -18,17 +18,18 @@ async def download_single_pdf(
     Asynchronous download of a single pdf file from a link given.
 
     input:
-        session - ClientSession for the single download.
-        semaphore - Semaphore for the thread granted
-        url - Str of url pulled from Excel
-        backup_url - Str of backup url pulled from Excel
+        session -       ClientSession for the single download.
+        semaphore -     Semaphore for the thread granted
+        url -           Str of url pulled from Excel
+        backup_url -    Str of backup url pulled from Excel
         backup_missing - Bool of whether the backup is missing for the given url
-        link_index - int index from Excel.
-        timeout - ClientTimeout giving 
+        link_index -    int index from Excel.
+        timeout -       ClientTimeout giving 
 
     output:
         True/False - Whether the file was succesfully downloaded
     '''
+
     download_url = url
     async with semaphore:
         try:
@@ -94,11 +95,12 @@ async def download_single_pdf(
 
 async def download_pdf_async(
         url_list, backup_list, backup_missing,
-        link_index, timeout_for_links = 30, max_connections = 20 ):
+        link_index, timeout_for_links = 90, max_connections = 20 ):
     '''
     Function for combining multiple asynchronous downloads into one session.
     
     '''
+
     PDF_DOWNLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
     semaphore = asyncio.Semaphore(max_connections)
 
@@ -106,12 +108,13 @@ async def download_pdf_async(
 
     headers = {
         "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) "
+            "Gecko/20100101 "
+            "Firefox/157.0 "
             "Chrome/141.0.0.0 Safari/537.36"
         ),
         "Accept": (
-            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+            "text/html,application/xhtml+xml,application/xml,application/pdf;q=0.9,*/*;q=0.8"
         ),
         "Accept-Language": (
             "en-US,en;q=0.9"
@@ -167,6 +170,9 @@ async def download_pdf_async(
 async def test_url(url):
     '''
     Test a singular url
+
+    input:
+        url - Str of a url
     '''
 
     headers = {

@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-from cli.config import DEFAULT_EXCEL, EXCEL_SHEETS
+from config import DEFAULT_EXCEL, EXCEL_SHEETS
 
 
 def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL):
