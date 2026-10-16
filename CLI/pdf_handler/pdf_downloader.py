@@ -7,7 +7,7 @@ from tqdm import tqdm
 import requests
 
 # Importing the relevant paths from config
-from config import PDF_DOWNLOAD_FOLDER
+from cli.config import PDF_DOWNLOAD_FOLDER
 
 def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_links=30):
     '''

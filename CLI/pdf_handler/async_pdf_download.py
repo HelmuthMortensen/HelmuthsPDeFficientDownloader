@@ -6,13 +6,7 @@ from tqdm import tqdm
 
 
 # Importing the relevant paths from config
-from config import PDF_DOWNLOAD_FOLDER
-
-
-# We define the maximum number of connections at once using a Semaphore
-
-
-
+from cli.config import PDF_DOWNLOAD_FOLDER
 
 def is_pdf(content:bytes) -> bool:
     return content.startswith(b'%PDF-')
@@ -24,13 +18,13 @@ async def download_single_pdf(
     Asynchronous download of a single pdf file from a link given.
 
     input:
-        session - 
-        semaphore -
-        url - 
-        backup_url - 
-        backup_missing - 
-        link_index - 
-        timeout - 
+        session - ClientSession for the single download.
+        semaphore - Semaphore for the thread granted
+        url - Str of url pulled from Excel
+        backup_url - Str of backup url pulled from Excel
+        backup_missing - Bool of whether the backup is missing for the given url
+        link_index - int index from Excel.
+        timeout - ClientTimeout giving 
 
     output:
         True/False - Whether the file was succesfully downloaded
@@ -115,6 +109,18 @@ async def download_pdf_async(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/141.0.0.0 Safari/537.36"
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        ),
+        "Accept-Language": (
+            "en-US,en;q=0.9"
+        ),
+        "Accept-Encoding": (
+            "gzip, deflate, br"
+        ),
+        "Connection": (
+            "keep-alive"
         )
     }
 
@@ -130,7 +136,7 @@ async def download_pdf_async(
                 timeout=timeout_for_links,
             )
             for i in range(len(url_list)
-                           )
+                    )
         ]
 
         results = []
@@ -155,3 +161,37 @@ async def download_pdf_async(
         }
 
         return results, run_result
+
+
+
+async def test_url(url):
+    '''
+    Test a singular url
+    '''
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/141.0.0.0 Safari/537.36"
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        ),
+        "Accept-Language": (
+            "en-US,en;q=0.9"
+        ),
+        "Accept-Encoding": (
+            "gzip, deflate, br"
+        ),
+        "Connection": (
+            "keep-alive"
+        )
+    }
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get(url) as response:
+            print(response.status)
+            print(response.url)
+
+            

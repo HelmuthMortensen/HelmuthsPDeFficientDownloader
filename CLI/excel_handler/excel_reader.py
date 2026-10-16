@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-from config import DEFAULT_EXCEL, EXCEL_SHEETS
+from cli.config import DEFAULT_EXCEL, EXCEL_SHEETS
 
 
 def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL):
@@ -16,6 +16,7 @@ def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL):
         url_list - List of Str-URLs in the "url" column 
         url_backup_list - List of Str-URLs in the "alt url" column
         no_backups - List of backups containing no links at all.
+        link_index - list of int link indeces from original Excel
 
     '''
 

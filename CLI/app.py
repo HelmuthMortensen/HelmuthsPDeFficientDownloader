@@ -6,12 +6,12 @@ import asyncio
 
 
 # IMPORT FROM OTHER MODULES HERE
-from pdf_handler.pdf_downloader import download_pdf
-from pdf_handler.async_pdf_download import download_pdf_async
-from excel_handler.excel_reader import excel_reader, excel_list_cleaner
-from excel_handler.excel_writer import write_report
-from config import PROJ_ROOT, EXCEL_SHEETS, PDF_DOWNLOAD_FOLDER, DEFAULT_EXCEL
-from joke_handler.joker import joke_returner
+from cli.pdf_handler.pdf_downloader import download_pdf
+from cli.pdf_handler.async_pdf_download import download_pdf_async
+from cli.excel_handler.excel_reader import excel_reader, excel_list_cleaner
+from cli.excel_handler.excel_writer import write_report
+from cli.config import PROJ_ROOT, EXCEL_SHEETS, PDF_DOWNLOAD_FOLDER, DEFAULT_EXCEL
+from cli.joke_handler.joker import joke_returner
 
 
 app = typer.Typer(help="Hi! Welcome to the PDF Downloader app. We are happy to have you here with us. \n Commands are listed below:")
