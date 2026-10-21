@@ -82,9 +82,29 @@ def test_excel_reader_removes_nan(tmp_path):
 
     urls, backups, no_backups, link_index = excel_reader(tmp_path, "test.xlsx")
 
-    assert len(urls) == 2
+    assert len(urls) == 1
     assert urls[0] == "https://site.com/a.pdf"
-    assert pd.isna(urls[1])
+    assert list(link_index) == [1]
+
+def test_excel_reader_skips_downloaded_ids_without_misalignment(tmp_path):
+    df = pd.DataFrame(
+        {
+            "id": [10, 20],
+            "url": ["https://site.com/already.pdf", "https://site.com/next.pdf"],
+            "alt url": [None, "https://backup.com/next.pdf"],
+        }
+    )
+    df.to_excel(tmp_path / "test.xlsx", index=False)
+
+    urls, backups, no_backups, link_ids = excel_reader(
+        tmp_path, "test.xlsx", skip_ids={10}
+    )
+
+    assert list(urls) == ["https://site.com/next.pdf"]
+    assert list(backups) == ["https://backup.com/next.pdf"]
+    assert list(no_backups) == [False]
+    assert list(link_ids) == [20]
+    assert link_ids[0] == 20
 
 def test_cleaner_removes_row_when_url_and_backup_is_missing():
 

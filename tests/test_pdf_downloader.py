@@ -25,7 +25,7 @@ def test_falls_back_to_backup_when_primary_not_pdf(monkeypatch):
         fake_get
     )
 
-    download_pdf(
+    results = download_pdf(
         url_list=["primary"],
         backup_list=["backup"],
         backup_missing=[False],
@@ -33,6 +33,9 @@ def test_falls_back_to_backup_when_primary_not_pdf(monkeypatch):
     )
 
     assert calls == ["primary", "backup"]
+    assert results[0]["success"] is True
+    assert results[0]["index"] == 1
+    assert results[0]["used_backup"] is True
 
 
 def test_falls_back_when_primary_raises(monkeypatch):
@@ -54,7 +57,7 @@ def test_falls_back_when_primary_raises(monkeypatch):
         fake_get,
     )
 
-    download_pdf(
+    results = download_pdf(
         ["primary"],
         ["backup"],
         [False],
@@ -62,3 +65,5 @@ def test_falls_back_when_primary_raises(monkeypatch):
     )
 
     assert calls == ["primary", "backup"]
+    assert results[0]["success"] is True
+    assert results[0]["used_backup"] is True
