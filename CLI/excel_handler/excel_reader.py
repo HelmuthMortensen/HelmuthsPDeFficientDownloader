@@ -4,7 +4,7 @@ from pathlib import Path
 from config import DEFAULT_EXCEL, EXCEL_SHEETS
 
 
-def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL):
+def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL, skip_ids=()):
     '''
     Simple function for reading the excel and returning the needed column lists.
     
@@ -23,13 +23,27 @@ def excel_reader(filepath=EXCEL_SHEETS, filename=DEFAULT_EXCEL):
     excel_path = filepath / filename
     excel = pd.read_excel(excel_path)
 
+    if skip_ids:
+        excel = excel.loc[~excel["id"].isin(skip_ids)]
+
+    for column in ("url", "alt url"):
+        excel[column] = excel[column].replace(r"^\s*$", pd.NA, regex=True)
+
+    has_url = excel["url"].notna() | excel["alt url"].notna()
+    excel = excel.loc[has_url]
+
     link_index = excel["id"]
     url_list = excel["url"]
     url_backup_list = excel["alt url"]
     no_backups = pd.isna(url_backup_list)
     url_list, url_backup_list, no_backups = excel_list_cleaner(url_list, url_backup_list, no_backups)
 
-    return url_list, url_backup_list, no_backups, link_index
+    return (
+        url_list.reset_index(drop=True),
+        url_backup_list.reset_index(drop=True),
+        no_backups.reset_index(drop=True),
+        link_index.reset_index(drop=True),
+    )
 
 
 def excel_list_cleaner(url_list, url_backup_list, no_backups):

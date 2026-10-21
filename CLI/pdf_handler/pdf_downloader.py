@@ -15,6 +15,7 @@ def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_
     '''
 
     PDF_DOWNLOAD_FOLDER.mkdir(exist_ok=True)
+    results = []
 
     for i, url in enumerate(tqdm(url_list)):
 
@@ -31,6 +32,7 @@ def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_
 
         save_path = PDF_DOWNLOAD_FOLDER / filename
         
+        used_backup = False
         try:
             r = requests.get(url, timeout=timeout_for_links)
             r.raise_for_status()
@@ -38,22 +40,46 @@ def download_pdf(url_list, backup_list, backup_missing, link_index, timeout_for_
             if not is_pdf(r):
                 raise ValueError("Primary URL is not a valid PDF.")
 
-        except (requests.RequestException, ValueError):
+        except (requests.RequestException, ValueError) as primary_error:
             if backup_missing[i]:
+                results.append({
+                    "success": False,
+                    "index": link_index[i],
+                    "filename": None,
+                    "used_backup": False,
+                    "fail_reason": str(primary_error),
+                })
                 continue
             try:
+                used_backup = True
                 r = requests.get(backup_list[i],  timeout=timeout_for_links)
                 r.raise_for_status()
 
                 if not is_pdf(r):
                     raise ValueError("Secondary URL is not a valid PDF.")
-            except (requests.RequestException, ValueError):
+            except (requests.RequestException, ValueError) as backup_error:
+                results.append({
+                    "success": False,
+                    "index": link_index[i],
+                    "filename": None,
+                    "used_backup": True,
+                    "fail_reason": str(backup_error),
+                })
                 continue
 
         with open(save_path, "wb") as f:
             f.write(r.content)
         # Alternative pathlib write: save_path.write_bytes(r.content)
 
+        results.append({
+            "success": True,
+            "index": link_index[i],
+            "filename": filename,
+            "used_backup": used_backup,
+            "fail_reason": None,
+        })
+
+    return results
 def is_pdf(response):
     '''
     Tiny function to check whether downloaded file constitutes a valid PDF (that is, starts with the correct byte input)

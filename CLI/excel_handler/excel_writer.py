@@ -1,8 +1,11 @@
 import pandas as pd
 from pathlib import Path
+import time
+
+from config import DOWNLOAD_REPORTS_LOCATION
 
 
-def write_report(report, output_path = Path("download_report.xlsx")):
+def write_report(report):
     '''
     Function for taking the output of the async pdf downloader and writing a report to an excel sheet.
 
@@ -20,6 +23,12 @@ def write_report(report, output_path = Path("download_report.xlsx")):
 
     df = pd.DataFrame(report)
 
-    df.to_excel(output_path, index=False)
+    # Create the folder if it does not exist:
+    DOWNLOAD_REPORTS_LOCATION.mkdir(parents=True, exist_ok=True)
 
-    return output_path
+    file_name = time.localtime()
+    output_loc = DOWNLOAD_REPORTS_LOCATION / f"download_report_{file_name[0]}{file_name[1]}{file_name[2]}.xlsx"
+
+    df.to_excel(output_loc, index=False)
+
+    return output_loc
